@@ -32,8 +32,15 @@ def responder(message):
     if message.text and "mercadolivre.com" in message.text:
         link_afiliado = gerar_link_afiliado(message.text)
         bot.reply_to(
-            message,
-            f"🛍️ Aqui está seu link com possível desconto!\n{link_afiliado}"
-        )
+    message,
+    f"""🛍️ LINK COM POSSÍVEL DESCONTO LIBERADO!
+
+🔥 Pode estar com oferta ativa
+🚚 Veja se tem frete grátis na sua região
+
+👉 {link_afiliado}
+
+Corre antes que o preço mude 👀"""
+)
 
 bot.polling()
