@@ -8,18 +8,22 @@ bot = telebot.TeleBot(TOKEN)
 SEU_ID_AFILIADO = "40151652"
 
 def gerar_link_afiliado(link):
+    # Remove tudo depois do #
+    link = link.split("#")[0]
+
     # Remove qualquer matt_tool existente
     link = re.sub(r'matt_tool=\d+', '', link)
 
-    # Remove && ou ?& que possam sobrar
-    link = link.replace("&&", "&").replace("?&", "?")
+    # Remove & sobrando no final
+    link = re.sub(r'[&?]+$', '', link)
+
+    # Remove && duplicado
+    link = link.replace("&&", "&")
 
     if "?" in link:
         return link + f"&matt_tool={SEU_ID_AFILIADO}"
     else:
         return link + f"?matt_tool={SEU_ID_AFILIADO}"
-
-@bot.message_handler(func=lambda message: True)
 def responder(message):
     if message.text and "mercadolivre.com" in message.text:
         link_afiliado = gerar_link_afiliado(message.text)
