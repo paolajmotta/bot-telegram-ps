@@ -56,6 +56,7 @@ def responder(message):
                 )
 
 # ===== OFERTAS AUTOMÁTICAS =====
+bot.send_message(CANAL_OFERTAS, "Teste canal funcionando")
 produtos_enviados = set()
 
 def buscar_ofertas():
