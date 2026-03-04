@@ -1,4 +1,3 @@
-print("BOT INICIADO")
 import telebot
 import os
 import re
@@ -15,9 +14,10 @@ SEU_ID_AFILIADO = "40151652"
 
 bot = telebot.TeleBot(TOKEN)
 
+print("BOT INICIANDO...")
+
 # ===== GERAR LINK AFILIADO =====
 def gerar_link_afiliado(link):
-
     url_match = re.search(r'https?://[^\s]+', link)
     if not url_match:
         return None
@@ -56,25 +56,39 @@ def responder(message):
                 )
 
 # ===== OFERTAS AUTOMÁTICAS =====
-bot.send_message(CANAL_OFERTAS, "Teste canal funcionando")
+
 produtos_enviados = set()
 
 def buscar_ofertas():
+
+    print("Buscando ofertas...")
 
     url = "https://api.mercadolibre.com/sites/MLB/search?q=desconto&sort=discount_percentage&limit=20"
 
     try:
         response = requests.get(url, timeout=10)
+        print("Status API:", response.status_code)
+
+        if response.status_code != 200:
+            print("Erro na API")
+            return
+
         dados = response.json()
         produtos = dados.get("results", [])
 
+        print("Produtos encontrados:", len(produtos))
+
         ofertas_validas = [
             p for p in produtos
-            if p["id"] not in produtos_enviados
-            and p.get("original_price")  # garante que tem desconto real
+            if p.get("original_price")
+            and p["id"] not in produtos_enviados
+            and p["original_price"] > p["price"]
         ]
 
+        print("Ofertas válidas:", len(ofertas_validas))
+
         if not ofertas_validas:
+            print("Nenhuma oferta válida encontrada")
             return
 
         produto = random.choice(ofertas_validas)
@@ -82,7 +96,7 @@ def buscar_ofertas():
 
         titulo = produto["title"]
         preco = produto["price"]
-        preco_antigo = produto.get("original_price")
+        preco_antigo = produto["original_price"]
         link = f'{produto["permalink"]}?matt_tool={SEU_ID_AFILIADO}'
 
         mensagem = f"""🔥 OFERTA 24H
@@ -96,6 +110,7 @@ def buscar_ofertas():
 """
 
         bot.send_message(CANAL_OFERTAS, mensagem)
+        print("Oferta enviada com sucesso")
 
     except Exception as e:
         print("Erro ao buscar oferta:", e)
@@ -103,10 +118,22 @@ def buscar_ofertas():
 def postar_automatico():
     while True:
         buscar_ofertas()
-        time.sleep(10)  # 30 minutos
+        time.sleep(30)  # 30 segundos para teste (depois você pode aumentar)
 
-thread = threading.Thread(target=postar_automatico)
-thread.daemon = True
-thread.start()
+# ===== MENSAGEM INICIAL =====
+def mensagem_inicial():
+    time.sleep(5)
+    try:
+        bot.send_message(CANAL_OFERTAS, "Canal online e pronto para ofertas")
+        print("Mensagem inicial enviada")
+    except Exception as e:
+        print("Erro ao enviar mensagem inicial:", e)
 
+# ===== INICIAR THREADS =====
+threading.Thread(target=postar_automatico, daemon=True).start()
+threading.Thread(target=mensagem_inicial, daemon=True).start()
+
+print("BOT INICIADO")
+
+# ===== INICIAR POLLING =====
 bot.polling(none_stop=True)
