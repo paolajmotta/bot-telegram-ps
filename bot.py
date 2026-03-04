@@ -1,3 +1,4 @@
+print("BOT INICIADO")
 import telebot
 import os
 import re
