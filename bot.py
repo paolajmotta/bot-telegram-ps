@@ -99,7 +99,7 @@ def buscar_ofertas():
 def postar_automatico():
     while True:
         buscar_ofertas()
-        time.sleep(1800)
+        time.sleep(10)
 
 threading.Thread(target=postar_automatico).start()
 
