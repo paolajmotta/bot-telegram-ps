@@ -65,12 +65,17 @@ def buscar_ofertas():
 
     url = "https://api.mercadolibre.com/sites/MLB/search?q=desconto&sort=discount_percentage&limit=20"
 
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0 Safari/537.36"
+    }
+
     try:
-        response = requests.get(url, timeout=10)
+        response = requests.get(url, headers=headers, timeout=10)
         print("Status API:", response.status_code)
 
         if response.status_code != 200:
             print("Erro na API")
+            print(response.text)
             return
 
         dados = response.json()
@@ -114,7 +119,6 @@ def buscar_ofertas():
 
     except Exception as e:
         print("Erro ao buscar oferta:", e)
-
 def postar_automatico():
     while True:
         buscar_ofertas()
