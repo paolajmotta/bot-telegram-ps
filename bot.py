@@ -7,10 +7,17 @@ import time
 import random
 
 # ===== CONFIG =====
+set ML_ACCESS_TOKEN=030423-8d65c87288APP_USR-1467792281449758-6443731d3fbf0ca3877e4e-554817674
+ML_ACCESS_TOKEN = os.getenv("ML_ACCESS_TOKEN")
+
+headers_ml = {
+    "Authorization": f"Bearer {ML_ACCESS_TOKEN}"
+}
 TOKEN = os.getenv("TOKEN")
 GRUPO_LINKS = -1003875043661
 CANAL_OFERTAS = -1003758218142
 SEU_ID_AFILIADO = "40151652"
+set ML_ACCESS_TOKEN=SEU_ACCESS_TOKEN
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -65,12 +72,9 @@ def buscar_ofertas():
 
     url = "https://api.mercadolibre.com/sites/MLB/search?q=desconto&sort=discount_percentage&limit=20"
 
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0 Safari/537.36"
-    }
-
     try:
-        response = requests.get(url, headers=headers, timeout=10)
+        response = requests.get(url, headers=headers_ml, timeout=10)
+
         print("Status API:", response.status_code)
 
         if response.status_code != 200:
@@ -81,8 +85,6 @@ def buscar_ofertas():
         dados = response.json()
         produtos = dados.get("results", [])
 
-        print("Produtos encontrados:", len(produtos))
-
         ofertas_validas = [
             p for p in produtos
             if p.get("original_price")
@@ -90,10 +92,7 @@ def buscar_ofertas():
             and p["original_price"] > p["price"]
         ]
 
-        print("Ofertas válidas:", len(ofertas_validas))
-
         if not ofertas_validas:
-            print("Nenhuma oferta válida encontrada")
             return
 
         produto = random.choice(ofertas_validas)
@@ -115,10 +114,10 @@ def buscar_ofertas():
 """
 
         bot.send_message(CANAL_OFERTAS, mensagem)
-        print("Oferta enviada com sucesso")
+        print("Oferta enviada")
 
     except Exception as e:
-        print("Erro ao buscar oferta:", e)
+        print("Erro:", e)
 def postar_automatico():
     while True:
         buscar_ofertas()
