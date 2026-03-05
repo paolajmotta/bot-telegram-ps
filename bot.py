@@ -7,7 +7,6 @@ import time
 import random
 
 # ===== CONFIG =====
-set ML_ACCESS_TOKEN=030423-8d65c87288APP_USR-1467792281449758-6443731d3fbf0ca3877e4e-554817674
 ML_ACCESS_TOKEN = os.getenv("ML_ACCESS_TOKEN")
 
 headers_ml = {
